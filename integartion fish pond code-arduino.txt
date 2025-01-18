@@ -1,0 +1,154 @@
+#include <ESP32Servo.h>
+
+// Servo Settings
+const int servoPin = 5;  // Pin connected to servo
+Servo feederServo;
+
+// Water Pump Settings
+const int relayPin = 38;     // Pin connected to relay
+const int pumpDuration = 5000; // Pump run time (ms)
+
+// Button Settings
+const int buttonPin = 39;    // Pin connected to button
+bool buttonPressed = false;  // Tracks button press
+bool isMoving = false;       // Tracks if servo is moving
+
+
+
+const int ledGreen = 7;
+
+
+// Rain Sensor Settings (Water Level Sensor)
+const int rainSensorPin = 4;  // Pin connected to rain sensor (ADC pin)
+const int waterThreshold = 3000; // Adjust based on your sensor's output range (low value = no water)
+
+// Timing Settings
+unsigned long lastServoActionTime = 0;
+const unsigned long feedingInterval = 120000; // Automatic feeding interval (1 hour)
+unsigned long lastPumpActionTime = 0;
+const unsigned long pumpInterval = 60000;   // Automatic pump interval (1 minutes)
+unsigned long lastButtonPressTime = 0;        // Debounce timer for button
+const unsigned long debounceDelay = 200;      // Debounce time (ms)
+
+// Servo State
+int servoPosition = 0;
+bool servoReturning = false; // Tracks if the servo is returning to the initial position
+
+// State Flags
+bool pumpActive = false;
+
+void setup() {
+  // Servo Setup
+  feederServo.attach(servoPin);
+  feederServo.write(0);  // Initial position
+
+  // Relay Setup
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW); // Turn off pump initially
+
+  // Button Setup
+  pinMode(buttonPin, INPUT_PULLUP); // Button with internal pull-up resistor
+
+  pinMode(ledGreen, OUTPUT);
+  digitalWrite(ledGreen, LOW);
+
+
+  // Rain Sensor Setup
+    pinMode(rainSensorPin, INPUT);
+
+
+  // Serial Monitor
+  Serial.begin(9600);
+  Serial.println("System Initialized. Push the button for manual feeding.");
+
+  // Activate water pump immediately
+  Serial.println("Activating Water Pump on Startup...");
+  pumpWater();
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  // Automatic Feeding
+  if (currentMillis - lastServoActionTime >= feedingInterval && !isMoving) {
+    lastServoActionTime = currentMillis;
+    startServoMovement(); // Trigger automatic feeding
+  }
+
+  // Automatic Water Pump
+  /**if (currentMillis - lastPumpActionTime >= pumpInterval) {
+    lastPumpActionTime = currentMillis;
+    pumpWater(); // Trigger automatic water pump
+  }/
+
+  // Manual Feeding via Button
+  int buttonState = digitalRead(buttonPin);
+  if (buttonState == LOW && !buttonPressed && !isMoving && (currentMillis - lastButtonPressTime > debounceDelay)) {
+    buttonPressed = true;
+    lastButtonPressTime = currentMillis;
+    startServoMovement(); // Trigger manual feeding
+  }
+  if (buttonState == HIGH && buttonPressed) {
+    buttonPressed = false; // Reset button state
+  }
+
+
+  // Water Level Check and Pump Activation
+    int waterLevel = analogRead(rainSensorPin); // Read rain sensor value
+    Serial.print("Water Level: ");
+    Serial.println(waterLevel);
+
+    // Check if water level is below threshold to activate pump
+    if (waterLevel > waterThreshold && !pumpActive) {
+      Serial.println("Low Water Detected! Starting Pump...");
+      pumpWater(); // Turn on pump if water level is low
+  }
+
+  // Handle Servo Movement
+  handleServoMovement(currentMillis);
+
+}
+
+void startServoMovement() {
+  isMoving = true;
+  servoPosition = 0;  // Start from 0 degrees
+  servoReturning = false; // Servo is moving forward
+  digitalWrite(ledGreen, HIGH);
+  Serial.println("Feeding Started...");
+}
+
+void handleServoMovement(unsigned long currentMillis) {
+  if (isMoving) {
+    if (!servoReturning && servoPosition < 180) {
+      servoPosition++;
+      feederServo.write(servoPosition);
+      delay(15); // Smooth movement
+    } else if (!servoReturning) {
+      servoReturning = true; // Start returning
+      delay(1000); // Hold position for 1 second
+    } else if (servoReturning && servoPosition > 0) {
+      servoPosition--;
+      feederServo.write(servoPosition);
+      delay(15); // Smooth movement
+    } else {
+      isMoving = false; // Movement complete
+      digitalWrite(ledGreen, LOW);
+      Serial.println("Feeding Complete");
+    }
+  }
+}
+
+void pumpWater() {
+    Serial.println("Water Pump ON");
+    digitalWrite(relayPin, HIGH); // Turn on pump
+    pumpActive = true;
+
+    // Monitor the rain sensor while the pump runs
+    while (analogRead(rainSensorPin) < waterThreshold) {
+        delay(500); // Check every 500ms if the water level has been restored
+    }
+
+    digitalWrite(relayPin, LOW);  // Turn off pump
+    pumpActive = false;
+    Serial.println("Water Pump OFF - Pond Full");
+}
