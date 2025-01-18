@@ -28,11 +28,10 @@ bool pumpActive = false;
 bool greenLEDState = false;
 bool relayPumpState = false;
 int servoPosition = 0;
-bool servoReturning = false;
 
 // Servo Motor Instance
 Servo feederServo;
-led LeDgReeN;
+
 
 bool buttonPressed = false;
 bool isMoving = false;
