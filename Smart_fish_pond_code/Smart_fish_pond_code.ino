@@ -21,7 +21,7 @@ unsigned long lastMsgTime = 0;
 // Water Threshold and Timing
 const int waterThreshold = 3000; 
 const int pumpDuration = 5000;   
-const unsigned long feedingInterval = 120000; 
+
 
 // State Variables
 bool pumpActive = false;
