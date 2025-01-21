@@ -20,7 +20,7 @@ const int ledGreen = 7;
 
 // Rain Sensor Settings (Water Level Sensor)
 const int rainSensorPin = 4;  // Pin connected to rain sensor (ADC pin)
-const int waterThreshold = 3000; // Adjust based on your sensor's output range (low value = no water)
+const int waterThreshold = 3000; 
 
 // Timing Settings
 unsigned long lastServoActionTime = 0;
@@ -76,10 +76,10 @@ void loop() {
   }
 
   // Automatic Water Pump
-  /**if (currentMillis - lastPumpActionTime >= pumpInterval) {
+  if (currentMillis - lastPumpActionTime >= pumpInterval) {
     lastPumpActionTime = currentMillis;
     pumpWater(); // Trigger automatic water pump
-  }/
+  }
 
   // Manual Feeding via Button
   int buttonState = digitalRead(buttonPin);
