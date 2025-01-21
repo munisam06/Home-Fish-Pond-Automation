@@ -1,4 +1,4 @@
-# IOT-based-Smart-Fish-Pond
+# IoT Based Home Fish Pond Automation
 
  # Overview
  The Smart Fish Pond Automation system is an IoT-based solution designed to automate the management of a fish pond. It uses sensors, actuators, and machine learning   
