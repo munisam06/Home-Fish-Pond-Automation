@@ -1,14 +1,14 @@
 #include "VOneMqttClient.h"
 #include <ESP32Servo.h>
 
-// V-One Cloud Device IDs (Ensure Correct IDs from V-One Cloud Portal)
+
 const char* ServoMotor = "9e5a08f2-a9d4-4594-b15a-a84f36fe52d6"; 
 const char* WaterLevelSensor = "9d816adf-acbb-4e45-b071-f57c1ed0a5c3"; 
 const char* PumpRelay = "ab71ab10-3ecb-4b6b-8d75-3520cb9d42c1";  
 const char* ButtonSensor = "49a2e6c6-e4d9-463a-b9c3-d184e40fb1e3";  
 const char* LEDIndicator = "a52187fe-78bd-414c-8737-1571e3dcbefc";     
 
-// Pin Assignments
+// Pin number
 const int servoPin = 5;  
 const int relayPin = 38;     
 const int buttonPin = 39;    
@@ -42,8 +42,6 @@ const unsigned long feedingInterval = 120000; // Automatic feeding interval (2 m
 unsigned long lastServoActionTime = 0;
 
 
-
-// V-One Client Instance
 VOneMqttClient voneClient;
 
 void setup_wifi() {
@@ -59,9 +57,6 @@ void setup_wifi() {
     Serial.println("IP address: ");
      Serial.println(WiFi.localIP());
 }
-
-
-
 
 void triggerActuator_callback(const char* actuatorDeviceId, const char* actuatorCommand) {
     Serial.print("Main received callback: ");
@@ -168,14 +163,9 @@ if (currentMillis - lastMsgTime > INTERVAL) {
         // Publish telemetry
         voneClient.publishTelemetryData(WaterLevelSensor, "Raining", waterLevel);
         voneClient.publishTelemetryData(ButtonSensor, "Button1", buttonState);
-        Serial.println("Telemetry data sent to V-One Cloud.");
-
-
-      
+        Serial.println("Telemetry data sent to V-One Cloud."); 
     
 }
-
-
 
     // Handle button press with debounce
     if (buttonState == LOW && !buttonPressed && (currentMillis - lastButtonPressTime > debounceDelay)) {
@@ -194,7 +184,7 @@ if (currentMillis - lastMsgTime > INTERVAL) {
         voneClient.publishDeviceStatusEvent(ButtonSensor, true, "Button Pressed");
     }
 
-    // Handle button release
+   
     if (buttonState == HIGH && buttonPressed) {
         buttonPressed = false;
         Serial.println("Button Released.");
@@ -208,8 +198,8 @@ if (currentMillis - lastMsgTime > INTERVAL) {
     // Automatic Feeding
   if (currentMillis - lastServoActionTime >= feedingInterval && !isMoving) {
     lastServoActionTime = currentMillis;
+      
    // Trigger automatic feeding
-
      isMoving = true;
      servoMoveStartTime = currentMillis;  // Record start time
     digitalWrite(ledGreen, HIGH);
@@ -227,8 +217,6 @@ if (currentMillis - lastMsgTime > INTERVAL) {
         }
     }
 
-   
-
     // Activate Pump Control Based on Water Level
     if (waterLevel < waterThreshold && !pumpActive) {
       
@@ -243,7 +231,6 @@ if (currentMillis - lastMsgTime > INTERVAL) {
       voneClient.publishDeviceStatusEvent(PumpRelay, false, "Pump Deactivated");  // 
       Serial.println("Water Pump OFF - Pond Full");
     }
-
   }
 
 
