@@ -36,10 +36,10 @@ ESP32Servo.h (for servo motor control)
  1. Open the project {Smart_Fish_Pond} in the Arduino IDE
  2. Install required libraries
  3. Configure the following in the VOneMqttClient.h file
-
+ ```
   #define WIFI_SSID "Your_WiFi_Name"
   #define WIFI_PASSWORD "Your_WiFi_Password"
-
+ ```
 Note:
  V-One Cloud Device IDs: Replace the placeholders with actual device IDs from the V-One Cloud portal.
 
