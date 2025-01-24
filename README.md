@@ -33,7 +33,7 @@ ESP32Servo.h (for servo motor control)
 
 
 # Installation
- 1. Open the project {Smart_Fish_Pond} in the Arduino IDE
+ 1. Open the project {Smart_fish_pond_code} in the Arduino IDE
  2. Install required libraries
  3. Configure the following in the VOneMqttClient.h file
  ```
@@ -42,6 +42,11 @@ ESP32Servo.h (for servo motor control)
  ```
 Note:
  V-One Cloud Device IDs: Replace the placeholders with actual device IDs from the V-One Cloud portal.
+
+
+###Notes:
+
+  arduino.txt code is the base script for testing in order to deiver fully functional hardware system only. No cloud integration in this code.
 
 4. Upload the code to your ESP32.
 
