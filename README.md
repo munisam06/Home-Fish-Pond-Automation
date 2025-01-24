@@ -44,7 +44,7 @@ Note:
  V-One Cloud Device IDs: Replace the placeholders with actual device IDs from the V-One Cloud portal.
 
 
-###Notes:
+### Notes:
 
   arduino.txt code is the base script for testing in order to deiver fully functional hardware system only. No cloud integration in this code.
 
